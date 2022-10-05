@@ -95,7 +95,7 @@ class Parser:
             raise ValueError(f"unexpected token `{self.peek()}`")
 
     def parse_factor(self):
-        return self.parse_binary(self.parse_unary, TokenKind.plus, TokenKind.minus)
+        return self.parse_binary(self.parse_unary, TokenKind.multiply, TokenKind.divide)
 
     def parse_term(self):
         return self.parse_binary(self.parse_factor, TokenKind.plus, TokenKind.minus)
