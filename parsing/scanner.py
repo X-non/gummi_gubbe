@@ -26,9 +26,10 @@ class TokenKind(Enum):
                 return "div"
 
             case TokenKind.open_paren:
-                return "open_paren"
+                return "par"
             case TokenKind.closed_paren:
-                return "closed_paren"
+                return "par"
+
             case TokenKind.number:
                 return "num"
             case TokenKind.varible:
