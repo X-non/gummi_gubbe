@@ -1,18 +1,19 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, auto, unique
 from typing import Iterable
 
 
+@unique
 class TokenKind(Enum):
-    plus = auto
-    minus = auto
-    multiply = auto
-    divide = auto
+    plus = auto()
+    minus = auto()
+    multiply = auto()
+    divide = auto()
 
-    open_paren = auto
-    closed_paren = auto
-    number = auto
-    varible = auto
+    open_paren = auto()
+    closed_paren = auto()
+    number = auto()
+    varible = auto()
 
     def to_ast_kind(self) -> str:
         match self:
@@ -74,7 +75,8 @@ def scanner(text: str) -> Iterable[Token]:
             token_i += 1
         elif char.isdigit():
             first = token_i
-            while text[token_i].isdigit():
+            token_i += 1
+            while token_i < len(text) and text[token_i].isdigit():
                 token_i += 1
             # TODO Add float lexing
             yield Token(text[first:token_i], first, TokenKind.number)
