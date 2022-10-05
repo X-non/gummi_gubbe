@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Iterable, Optional
 
 from parsing.scanner import Token, TokenKind
@@ -8,11 +7,40 @@ from parsing.scanner import Token, TokenKind
 expr := term; 
 term := factor ( ("+"|"-") factor )*
 factor := unary ( ("*"|"/") unary  )* 
-unary := primary | '-' (unary)+
+unary := primary | '-' unary
 primary := var | number | "(" expr ")";
 var = ??single letter varialbe sometimes with subscript??
 number = ??int or float literal??
 """
+
+
+def ast_node_base(kind: TokenKind):
+    return {
+        "kind": kind.to_ast_kind(),
+    }
+
+
+def binary_node(kind: TokenKind, left, right):
+    base = ast_node_base(kind)
+    return {**base, "left": left, "right": right}
+
+
+def unary_node(kind: TokenKind, content):
+    base = {}
+    assert kind in [TokenKind.minus]
+    if kind == TokenKind.minus:
+        base["kind"] = "u-sub"
+
+    return {**base, "expr": content}
+
+
+def paren_node(content):
+    return {"kind": "par", "expr": content}
+
+
+def literal_node(token: Token):
+    # TODO mabye parse the number
+    return {**ast_node_base(token.kind), "val": token.lexeme}
 
 
 class Parser:
@@ -48,14 +76,25 @@ class Parser:
         pass
 
     def parse_unary(self):
-        pass
+
+        if self.eat_if(TokenKind.minus):
+            return unary_node(TokenKind.minus, self.parse_unary())
+        elif self.eat_if(TokenKind.open_paren):
+            content = self.parse_expr()
+            assert self.eat_if(TokenKind.closed_paren) is not None
+            return paren_node(content)
+        elif (token := self.eat_if(TokenKind.varible, TokenKind.number)) is not None:
+            return literal_node(token)
 
     def parse_factor(self):
-        pass
+        return self.parse_binary(self.parse_unary, TokenKind.plus, TokenKind.minus)
 
     def parse_term(self):
-        working_expr = self.parse_factor()
-        while token := self.eat_if(TokenKind.plus, TokenKind.minus):
-            assert token is not None, "Should have been prechecked"
-            working_expr
-            self.parse_factor
+        return self.parse_binary(self.parse_factor, TokenKind.plus, TokenKind.minus)
+
+    def parse_binary(self, operand_parser, *bin_ops: TokenKind):
+        working_expr = operand_parser()
+        while (token := self.eat_if(*bin_ops)) is not None:
+            right = operand_parser()
+            working_expr = binary_node(token.kind, working_expr, right)
+        return working_expr
