@@ -78,7 +78,7 @@ class Parser:
         return token
 
     def parse_expr(self):
-        pass
+        return self.parse_term()
 
     def parse_unary(self):
 
