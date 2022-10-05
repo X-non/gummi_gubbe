@@ -1,6 +1,7 @@
-from typing import Iterable, Optional
+from typing import Dict, Iterable, Optional
 
-from parsing.scanner import Token, TokenKind
+from parsing.scanner import Token, TokenKind, scanner
+
 
 # Grammer ish
 """ 
@@ -12,6 +13,10 @@ primary := var | number | "(" expr ")";
 var = ??single letter varialbe sometimes with subscript??
 number = ??int or float literal??
 """
+
+
+def parse(text: str):
+    return Parser(scanner(text)).parse_expr()
 
 
 def ast_node_base(kind: TokenKind):
