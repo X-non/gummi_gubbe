@@ -58,12 +58,13 @@ class Parser:
         if self.peek_token is None:
             try:
                 self.peek_token = self.tokens.__next__()
-            except:
+            except StopIteration:
                 self.is_done = True
         return self.peek_token
 
     def eat(self):
         token = self.peek()
+
         self.peek_token = None
         return token
 
@@ -74,14 +75,14 @@ class Parser:
 
         if token.kind in matches:
             self.eat()
+            return token
 
-        return token
+        return None
 
     def parse_expr(self):
         return self.parse_term()
 
     def parse_unary(self):
-
         if self.eat_if(TokenKind.minus):
             return unary_node(TokenKind.minus, self.parse_unary())
         elif self.eat_if(TokenKind.open_paren):
@@ -90,6 +91,8 @@ class Parser:
             return paren_node(content)
         elif (token := self.eat_if(TokenKind.varible, TokenKind.number)) is not None:
             return literal_node(token)
+        else:
+            raise ValueError(f"unexpected token `{self.peek()}`")
 
     def parse_factor(self):
         return self.parse_binary(self.parse_unary, TokenKind.plus, TokenKind.minus)
