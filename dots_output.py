@@ -1,7 +1,4 @@
-from dataclasses import dataclass
-from turtle import dot
-
-from parsing.parser import parse
+import graphviz
 
 
 class Uniquer:
