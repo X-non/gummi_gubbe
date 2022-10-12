@@ -1,6 +1,6 @@
 from pprint import pprint
 from unittest import result
-from dots_output import to_dots
+
 from parsing.parser import parse
 from parsing.scanner import scanner
 
