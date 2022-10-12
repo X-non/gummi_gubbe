@@ -1,4 +1,5 @@
-import graphviz
+import imp
+from pydot import Edge, Dot, Node
 
 
 class Uniquer:
@@ -14,16 +15,19 @@ class Uniquer:
         return self._count
 
 
-def to_dots(ast):
+def to_dots(ast) -> Dot:
     name_prov = Uniquer("N")
-    out = []
-    node_to_dots(ast, name_prov.unique(), name_prov, out)
+    dots_code = Dot("ast", graph_type="digraph", strict=True)
+    node_to_dots(ast, name_prov.unique(), name_prov, dots_code)
+    return dots_code
 
-    middle = "\n   ".join(out)
-    return f"digraph AST {{\n   {middle}\n}}"
+
+def write_ast_to_file(ast, file):
+    to_dots(ast).write_png(file)  # type: ignore
 
 
 def symbol_of_node(node):
+    assert "kind" in node
     match node["kind"]:
         case "add":
             return "+"
@@ -40,6 +44,8 @@ def symbol_of_node(node):
         case "num" | "var":
             return node["val"]
 
+    raise ValueError(f"Invalid kind `{ node['kind'] }`")
+
 
 def children(node):
     match node["kind"]:
@@ -53,10 +59,11 @@ def children(node):
     raise ValueError(f"Invalid node: {node}")
 
 
-def node_to_dots(node, id, name_prov, out):
+def node_to_dots(node, id: str, name_prov: Uniquer, dots_code: Dot):
     symbol = symbol_of_node(node)
-    out.append(f'{id} [label="{symbol}"]')
+    dots_code.add_node(Node(id, label=symbol))
+    # dots_code.append(f'{id} [label="{symbol}"]')
     for child in children(node):
         child_id = name_prov.unique()
-        out.append(f"{id} -> {child_id}")
-        node_to_dots(child, child_id, name_prov, out)
+        dots_code.add_edge(Edge(id, child_id))
+        node_to_dots(child, child_id, name_prov, dots_code)
