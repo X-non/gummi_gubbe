@@ -29,28 +29,25 @@ def read_symb(node_tree):
         raise ValueError(f"Invalid kind `{kind}`")
 
 
-def read_val(node_tree, direction):
+def format_node(node_tree, direction):
     if node_tree[direction]["kind"] == "num":
         return node_tree[direction]["val"]
+
     elif node_tree[direction]["kind"] != "num":
-        a = temp_list(node_tree, (direction))
-        left_str = read_val(a, "left")
-        right_str = read_val(a, "right")
-        if read_symb(a) != "\\fract":
-            return f"{left_str} {read_symb(a)} {right_str}"
+        child = node_tree[direction]
+        left_str = format_node(child, "left")
+        right_str = format_node(child, "right")
+        if read_symb(child) != "\\fract":
+            return f"{left_str} {read_symb(child)} {right_str}"
         else:
-            return f"{read_symb(a)}{{{left_str}}}{{{right_str}}}"
-
-
-def temp_list(node_tree, direction):
-    temp_list = node_tree[direction]
-    return temp_list
+            return f"{read_symb(child)}{{{left_str}}}{{{right_str}}}"
 
 
 def add(node_tree):
     if node_tree["kind"] == "add":
-        left = read_val(node_tree, "left")
-        right = read_val(node_tree, "right")
+
+        left = format_node(node_tree, "left")
+        right = format_node(node_tree, "right")
         return f"{left} + {right}"
 
 
