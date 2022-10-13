@@ -46,15 +46,15 @@ def start_event_loop(window: sg.Window):
                 display = ""
 
                 try:
-                    display = ""  # pformat(parse(text))
+                    display = pformat(parse(text))
                 except ValueError as e:
                     display = format_exeption(e)
                 window["Out"].update(display)  # type: ignore
 
-                try:
-                    window["img"].update(data=latex_to_base64(text))
-                except ValueError:
-                    pass
+                # try:
+                #     window["img"].update(data=latex_to_base64(text))
+                # except ValueError:
+                #     pass
 
             else:
                 window["Out"].update("")  # type: ignore
