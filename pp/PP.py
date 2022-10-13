@@ -17,8 +17,12 @@ Symbols = {
     "sub": "-",
     "mul": "\\cdot",
     "div": "\\frac",
-    "par": "()",
+    "par": "()",  # Mabye remove?
 }
+
+binary_nodes = ["add", "sub", "mul", "div"]
+unary_nodes = ["par", "u-sub"]
+literal_nodes = ["var", "num"]
 
 
 def read_symb(node_tree):
@@ -29,26 +33,22 @@ def read_symb(node_tree):
         raise ValueError(f"Invalid kind `{kind}`")
 
 
-def format_node(node_tree, direction):
-    if node_tree[direction]["kind"] == "num":
-        return node_tree[direction]["val"]
+def format_node(node):
+    kind = node["kind"]
+    if kind in literal_nodes:
+        return node["val"]
 
-    elif node_tree[direction]["kind"] != "num":
-        child = node_tree[direction]
-        left_str = format_node(child, "left")
-        right_str = format_node(child, "right")
-        if read_symb(child) != "\\fract":
-            return f"{left_str} {read_symb(child)} {right_str}"
+    elif kind in binary_nodes:
+        left = format_node(node["left"])
+        right = format_node(node["right"])
+        symbol = read_symb(node)
+
+        if symbol == "\\frac":
+            return f"\\frac{{{left}}}{{{right}}}"
         else:
-            return f"{read_symb(child)}{{{left_str}}}{{{right_str}}}"
+            return f"{left} {symbol} {right}"
+
+    raise NotImplementedError(f"for `{kind}`")
 
 
-def add(node_tree):
-    if node_tree["kind"] == "add":
-
-        left = format_node(node_tree, "left")
-        right = format_node(node_tree, "right")
-        return f"{left} + {right}"
-
-
-print(add(test))
+print(format_node(test))
