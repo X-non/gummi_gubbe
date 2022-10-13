@@ -79,6 +79,11 @@ class Parser:
 
         return None
 
+    def consume(self, *matches: TokenKind):
+        if self.eat_if(*matches) is None:
+            message = ", ".join(map(str, matches))
+            raise ValueError(f"Expected one of `{message}`")
+
     def parse_expr(self):
         return self.parse_term()
 
@@ -87,7 +92,8 @@ class Parser:
             return unary_node(TokenKind.minus, self.parse_unary())
         elif self.eat_if(TokenKind.open_paren):
             content = self.parse_expr()
-            assert self.eat_if(TokenKind.closed_paren) is not None
+            self.consume(TokenKind.closed_paren)
+
             return paren_node(content)
         elif (token := self.eat_if(TokenKind.varible, TokenKind.number)) is not None:
             return literal_node(token)
