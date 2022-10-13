@@ -22,10 +22,11 @@ Symbols = {
 
 
 def read_symb(node_tree):
-    if node_tree["kind"] in Symbols:
-        return Symbols[node_tree["kind"]]
+    kind = node_tree["kind"]
+    if kind in Symbols:
+        return Symbols[kind]
     else:
-        return "err"
+        raise ValueError(f"Invalid kind `{kind}`")
 
 
 def read_val(node_tree, direction):
