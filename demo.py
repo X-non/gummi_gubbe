@@ -3,6 +3,7 @@ from xml.dom.minidom import Element
 import PySimpleGUI as sg
 from demo_utils.latexrender import latex_to_base64
 from parsing.parser import parse
+from pp.PP import format_node
 
 
 def single_element_window(title, element) -> sg.Window:
@@ -53,7 +54,7 @@ def start():
         "main": sg.Window("Pyisson Demo", layout, finalize=True),
         "tree": text_window("Parse Tree", "tree"),
         "latex": text_window("Latex", "latex"),
-        "rendered": text_window("Latex Rendered", "latex"),
+        "rendered": img_window("Latex Rendered", "latex"),
     }
 
     start_event_loop(windows)
@@ -72,16 +73,15 @@ def start_event_loop(windows: dict[str, sg.Window]):
                 display = ""
 
                 try:
-                    display = pformat(parse(text))
+                    parsed = parse(text)
+                    display = pformat(parsed)
+                    windows["rendered"]["latex"].update(
+                        data=latex_to_base64(format_node(parsed))
+                    )
                 except ValueError as e:
                     display = format_exeption(e)
+
                 windows["tree"]["tree"].update(display)  # type: ignore
-
-                # try:
-                #     windows["rendered"]["latex"].update(data=latex_to_base64(text))
-                # except ValueError:
-                #     pass
-
             else:
                 windows["tree"]["tree"].update("")  # type: ignore
 
