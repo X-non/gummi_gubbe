@@ -1,7 +1,29 @@
-from pprint import PrettyPrinter, pformat, pprint
+from pprint import pformat
+from xml.dom.minidom import Element
 import PySimpleGUI as sg
 from demo_utils.latexrender import latex_to_base64
 from parsing.parser import parse
+
+
+def single_element_window(title, element) -> sg.Window:
+    return sg.Window(title, [[element]], finalize=True)
+
+
+def img_window(title, key):
+    return single_element_window(title, sg.Image(key=key))
+
+
+def text_window(title, key):
+
+    return single_element_window(
+        title,
+        sg.Text(
+            key=key,
+            size=(80, 10),
+            expand_x=True,
+        ),
+    )
+
 
 # main.parse()
 
@@ -12,7 +34,7 @@ right = [
         sg.Text(
             "",
             key="Out",
-            size=(40, 10),
+            size=(40, 5),
             text_color="black",
             background_color="white",
             expand_x=True,
@@ -21,27 +43,31 @@ right = [
 ]
 
 layout = [
-    [
-        sg.Text("Hello"),
-    ],
-    [sg.Image(key="img", data=latex_to_base64("\\frac{1}{2}"))],
-    [sg.Column(left), sg.Column(right)],
+    [sg.Text("Hello")],
+    [sg.InputText(key="In", enable_events=True, size=(10, 1))],
 ]
 
 
 def start():
-    window = sg.Window("Pyisson Demo", layout)
-    start_event_loop(window)
-    window.close()
+    windows = {
+        "main": sg.Window("Pyisson Demo", layout, finalize=True),
+        "tree": text_window("Parse Tree", "tree"),
+        "latex": text_window("Latex", "latex"),
+        "rendered": text_window("Latex Rendered", "latex"),
+    }
+
+    start_event_loop(windows)
+    for win in windows.values():
+        win.close()
 
 
-def start_event_loop(window: sg.Window):
+def start_event_loop(windows: dict[str, sg.Window]):
     while True:
-        event, values = window.read()  # type: ignore
-        print(event)
-        print(values)
+        window, event, values = sg.read_all_windows()  # type: ignore
+        # print(event)
+        # print(values)
         if "In" == event:
-            text = values["In"]
+            text = values["In"]  # type: ignore
             if text is not None and text != "":
                 display = ""
 
@@ -49,15 +75,15 @@ def start_event_loop(window: sg.Window):
                     display = pformat(parse(text))
                 except ValueError as e:
                     display = format_exeption(e)
-                window["Out"].update(display)  # type: ignore
+                windows["tree"]["tree"].update(display)  # type: ignore
 
                 # try:
-                #     window["img"].update(data=latex_to_base64(text))
+                #     windows["rendered"]["latex"].update(data=latex_to_base64(text))
                 # except ValueError:
                 #     pass
 
             else:
-                window["Out"].update("")  # type: ignore
+                windows["tree"]["tree"].update("")  # type: ignore
 
         if event == sg.WINDOW_CLOSED:
             break
