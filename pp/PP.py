@@ -50,11 +50,11 @@ def format_node(node):
 
     elif kind == "par":
         expr = format_node(node["expr"])
-        return f"({expr})" 
+        return f"({expr})"
 
     elif kind == "u-sub":
         expr = format_node(node["expr"])
-        return f"-({expr})" 
+        return f"-{expr}"
 
     raise NotImplementedError(f"for `{kind}`")
 
