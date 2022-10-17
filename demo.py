@@ -75,9 +75,9 @@ def start_event_loop(windows: dict[str, sg.Window]):
                 try:
                     parsed = parse(text)
                     display = pformat(parsed)
-                    windows["rendered"]["latex"].update(
-                        data=latex_to_base64(format_node(parsed))
-                    )
+                    latex = format_node(parsed)
+                    windows["latex"]["latex"].update(latex)
+                    windows["rendered"]["latex"].update(data=latex_to_base64(latex))
                 except ValueError as e:
                     display = format_exeption(e)
 
