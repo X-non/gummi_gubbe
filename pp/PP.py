@@ -48,6 +48,14 @@ def format_node(node):
         else:
             return f"{left} {symbol} {right}"
 
+    elif kind == "par":
+        expr = format_node(node["expr"])
+        return f"({expr})" 
+
+    elif kind == "u-sub":
+        expr = format_node(node["expr"])
+        return f"-({expr})" 
+
     raise NotImplementedError(f"for `{kind}`")
 
 
