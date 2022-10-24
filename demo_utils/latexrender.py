@@ -15,13 +15,13 @@ def fig2img(fig):
 
 
 # https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
-def latex_to_base64(latex):
+def latex_to_base64(latex, dpi=100):
     mpl.rcParams["savefig.transparent"] = True
 
     texFont = font_manager.FontProperties(size=30, family="serif", math_fontfamily="cm")
 
     buf = io.BytesIO()
-    mathtext.math_to_image(f"${latex}$", buf, prop=texFont, dpi=300, format="png")
+    mathtext.math_to_image(f"${latex}$", buf, prop=texFont, dpi=dpi, format="png")
 
     buf.seek(0)
     return base64.b64encode(buf.getbuffer())
