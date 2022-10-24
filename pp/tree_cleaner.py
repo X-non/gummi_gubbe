@@ -1,5 +1,3 @@
-from PP import *
-
 test = {
     "kind": "mul",
     "left": {"kind": "num", "val": "2"},
@@ -74,7 +72,3 @@ def clean_binary(node):
             right = remove_paren(right)
 
     return {"kind": kind, "left": tree_cleaner(left), "right": tree_cleaner(right)}
-
-
-print(format_node(test))
-print(format_node(tree_cleaner(test)))
