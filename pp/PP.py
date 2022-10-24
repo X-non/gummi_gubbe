@@ -1,15 +1,17 @@
 test = {
-    "kind": "add",
-    "left": {
-        "kind": "add",
-        "left": {"kind": "num", "val": "3"},
-        "right": {
-            "kind": "div",
-            "left": {"kind": "num", "val": "3"},
-            "right": {"kind": "num", "val": "4"},
+    "kind": "mul",
+    "left": {"kind": "num", "val": "2"},
+    "right": {
+        "expr": {
+            "kind": "add",
+            "left": {"kind": "num", "val": "1"},
+            "right": {
+                "expr": {"expr": {"kind": "num", "val": "2"}, "kind": "par"},
+                "kind": "par",
+            },
         },
+        "kind": "par",
     },
-    "right": {"kind": "num", "val": "36"},
 }
 
 Symbols = {
@@ -54,9 +56,13 @@ def format_node(node):
 
     elif kind == "u-sub":
         expr = format_node(node["expr"])
-        return f"-{expr}"
+        if expr in literal_nodes:
+            return f"-{expr}"
+        else:
+            return f"-({expr})"
 
     raise NotImplementedError(f"for `{kind}`")
 
 
-print(format_node(test))
+if __name__ == "__main__":
+    print(format_node(test))
