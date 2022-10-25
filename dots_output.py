@@ -1,4 +1,6 @@
+import base64
 import imp
+import io
 from pydot import Edge, Dot, Node
 
 
@@ -24,6 +26,13 @@ def to_dots(ast) -> Dot:
 
 def write_ast_to_file(ast, file):
     to_dots(ast).write_png(file)  # type: ignore
+
+
+def parse_tree_to_base64(node):
+
+    buf = io.BytesIO(bytes(to_dots(node).create(format="png")))
+
+    return base64.b64encode(buf.getbuffer())
 
 
 def symbol_of_node(node):
